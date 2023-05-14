@@ -1,7 +1,21 @@
 let str = React.string
+
+type action =
+  | Increment
+  | Decrement
+  | Reset(int)
+
+let reducer = (state, action) =>
+  switch action {
+  | Increment => state + 1
+  | Decrement => state - 1
+  | Reset(initialValue) => initialValue
+  }
+
 @react.component
 let make = (~initialValue: int) => {
-  let (count, setCount) = React.useState(() => initialValue)
+  let (count, dispatch) = React.useReducer(reducer, initialValue)
+
   let bgColor = if count > 0 {
     "bg-green-200"
   } else if count < 0 {
@@ -14,9 +28,9 @@ let make = (~initialValue: int) => {
       {("The count is " ++ count->Belt.Int.toString)->str}
     </p>
     <div className="flex justify-center">
-      <Button text="Increment" handleClick={_ => setCount(prev => prev + 1)} />
-      <Button text="Decrement" handleClick={_ => setCount(prev => prev - 1)} />
-      <Button text="Reset" handleClick={_ => setCount(_prev => 0)} />
+      <Button text="Increment" handleClick={_ => dispatch(Increment)} />
+      <Button text="Decrement" handleClick={_ => dispatch(Decrement)} />
+      <Button text="Reset" handleClick={_ => dispatch(Reset(initialValue))} />
     </div>
   </div>
 }
